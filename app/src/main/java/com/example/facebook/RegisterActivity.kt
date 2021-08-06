@@ -69,7 +69,6 @@ class RegisterActivity : AppCompatActivity() {
                 return
             }
         }
-
         loadImage()
     }
 
@@ -85,8 +84,6 @@ class RegisterActivity : AppCompatActivity() {
             }
             else-> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }
-
-
     }
 
     val PICK_IMAGE_CODE=123
@@ -109,7 +106,7 @@ class RegisterActivity : AppCompatActivity() {
             val coulomIndex=cursor.getColumnIndex(filePathColum[0])
             val picturePath=cursor.getString(coulomIndex)
             cursor.close()
-
+            Log.d("reac img", "onActivityResult: "+picturePath)
             IVuserImage.setImageBitmap(BitmapFactory.decodeFile(picturePath))
 
         }
@@ -147,7 +144,6 @@ class RegisterActivity : AppCompatActivity() {
                 val name= URLEncoder.encode(etName.text.toString(),"utf-8")
                 ImageUrl=URLEncoder.encode(ImageUrl,"utf-8")
                 val url="http://192.168.0.105/register.php?first_name="+etName.text+"&email="+etMail.text+"&pword="+etPwd.text+"&picture_path="+ImageUrl
-
                 val thread = Thread {
                     try {
                         val client = OkHttpClient()

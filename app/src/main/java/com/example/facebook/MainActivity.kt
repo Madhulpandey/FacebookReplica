@@ -88,7 +88,6 @@ class MainActivity : AppCompatActivity() {
 //        ListTweets.clear()
 //        ListTweets.add(Ticket("0","him","url","add"))
 //        adpater!!.notifyDataSetChanged()
-
         SearchInDatabase("%",0)
     }
 
@@ -157,7 +156,7 @@ class MainActivity : AppCompatActivity() {
                     loadImage()
                 }
                 myView.iv_post.setOnClickListener {
-                    ListTweets.add(0,Ticket("0","him","url","loading","",""))
+                    ListTweets.add(0,Ticket("0","him","url","loading","","","0"))
                     adpater!!.notifyDataSetChanged()
 
                     //CALL HTTP
@@ -176,13 +175,23 @@ class MainActivity : AppCompatActivity() {
             } else{
                 var myView=layoutInflater.inflate(R.layout.posts_ticket,null)
                 myView.txt_tweet.text = mytweet.tweetText
-
+                //myView.txt_tweet_date.text=mytweet.tweetDate
+                /////////////////////////////////////////////////////////
+                Log.d("MANAC TRIAL-1", "getView: "+mytweet.tweetDate)
                 Picasso.get().load(mytweet.tweetImageURL).into(myView.tweet_picture)
                 Log.d("PICTURE LOAD", "getView: "+mytweet.tweetImageURL)
 //                TODO SHOW USERNAME AND IMAGE
                 Picasso.get().load(mytweet.personImage).into(myView.picture_path)
                 Log.d("PICTURE LOAD", "getView: "+mytweet.personImage)
                 myView.txtUserName.text = mytweet.personName
+                myView.txtUserName.setOnClickListener {
+                    //http://192.168.0.105/Tweetlist.php?op=2&user_id=1&StartFrom=0
+                    val url="http://192.168.0.105/Tweetlist.php?op=2&user_id="+mytweet.personID+"&StartFrom=0"
+                    MyAsyncTask().execute(url)
+                  //  myView.etPost.setText("")
+                    //notifyDataSetChanged()
+                    adpater!!.notifyDataSetChanged()
+                }
                 return myView
             }
         }
@@ -219,15 +228,26 @@ class MainActivity : AppCompatActivity() {
             val coulomIndex=cursor.getColumnIndex(filePathColum[0])
             val picturePath=cursor.getString(coulomIndex)
             cursor.close()
-            //Log.d("yashvi",""+BitmapFactory.decodeFile(picturePath))
+            Log.d("mac img", "onActivityResult: "+picturePath)
             UploadImage(BitmapFactory.decodeFile(picturePath))
+
+            /*
+            val filePathColum= arrayOf(MediaStore.Images.Media.DATA)
+            val cursor= contentResolver.query(selectedImage!!,filePathColum,null,null,null)
+            cursor!!.moveToFirst()
+            val coulomIndex=cursor.getColumnIndex(filePathColum[0])
+            val picturePath=cursor.getString(coulomIndex)
+            cursor.close()
+            Log.d("reac img", "onActivityResult: "+picturePath)
+            IVuserImage.setImageBitmap(BitmapFactory.decodeFile(picturePath))
+            */
         }
 
     }
 
     var DownloadURL:String?="noImage"
     fun UploadImage(bitmap: Bitmap){
-        ListTweets.add(0,Ticket("0","him","url","loading","",""))
+        ListTweets.add(0,Ticket("0","him","url","loading","","","0"))
         adpater!!.notifyDataSetChanged()
 
         val storage= FirebaseStorage.getInstance()
@@ -313,15 +333,15 @@ class MainActivity : AppCompatActivity() {
                     adpater!!.notifyDataSetChanged()
                 }else if(json.getString("msg")=="has tweet"){
                     ListTweets.clear()
-                    ListTweets.add(Ticket("0","him","url","add","",""))
+                    ListTweets.add(Ticket("0","him","url","add","","","0"))
                     val tweets = JSONArray(json.getString("info"))
                     for(i in 0..tweets.length()-1){
                         val tweet=tweets.getJSONObject(i)
-                        ListTweets.add(Ticket(tweet.getString("post_id"),tweet.getString("post_text"),tweet.getString("post_picture"),tweet.getString("post_picture"),tweet.getString("first_name"),tweet.getString("picture_path")))
+                        ListTweets.add(Ticket(tweet.getString("post_id"),tweet.getString("post_text"),tweet.getString("post_picture"),tweet.getString("post_picture"),tweet.getString("first_name"),tweet.getString("picture_path"),tweet.getString("user_id")))
                     }
                 }else if(json.getString("msg")=="no tweet"){
                     ListTweets.clear()
-                    ListTweets.add(Ticket("0","him","url","add","",""))
+                    ListTweets.add(Ticket("0","him","url","add","","","0"))
                 }
                 adpater!!.notifyDataSetChanged()
 
